@@ -102,6 +102,8 @@ def train_and_save_model():
         "model_type": "RandomForestClassifier",
         "version": "v3.0.0-RF-Classifier-Persisted",
         "training_samples": len(X_train),
+        "dataset_size": len(X),
+        "test_samples": len(X_test),
         "features": list(X.columns),
         "training_data_type": "SYNTHETIC",
         "training_data_disclosure": (

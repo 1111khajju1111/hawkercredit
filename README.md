@@ -86,3 +86,21 @@ for a real deployment.
 - In-memory rate limiting (`slowapi` default) does not share state across
   multiple worker processes/instances - for a real multi-instance
   deployment, back it with Redis via `storage_uri`.
+
+
+## Production demo data and AI model registration
+
+This version includes:
+- exactly 100 seeded vendor profiles when `scripts/generate_demo_data.py` is run;
+- exactly 10 demo lender accounts (`lender@hawkercredit.com` through `lender10@hawkercredit.com`);
+- persisted RandomForest model version `v3.0.0-RF-Classifier-Persisted`;
+- automatic idempotent registration of the persisted model metrics in `ModelVersion` at API startup;
+- Admin metrics that select the latest ACTIVE HawkerCredit AI Scorer instead of the first database row.
+
+The credit model training dataset remains 2,000 procedurally generated synthetic rows (1,600 train / 400 test). It is not real vendor repayment data.
+
+For a fresh demo database, run:
+`python scripts/generate_demo_data.py`
+
+For an existing database where users should be added without resetting vendor financial history, run:
+`python scripts/seed_demo_users.py`

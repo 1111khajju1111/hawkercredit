@@ -43,14 +43,19 @@ def generate_synthetic_dataset():
     )
     db.add(admin_user)
 
-    # 2. Lender Demo Account
-    lender_user = User(
-        email="lender@hawkercredit.com",
-        phone="9999911111",
-        password_hash=get_password_hash("lender123"),
-        role="LENDER"
-    )
-    db.add(lender_user)
+    # 2. Exactly 10 synthetic/demo lender accounts.
+    lender_users = []
+    for i in range(1, 11):
+        email = "lender@hawkercredit.com" if i == 1 else f"lender{i}@hawkercredit.com"
+        phone = "9999911111" if i == 1 else f"99999{i:05d}"
+        lender_user = User(
+            email=email,
+            phone=phone,
+            password_hash=get_password_hash("lender123"),
+            role="LENDER"
+        )
+        db.add(lender_user)
+        lender_users.append(lender_user)
 
     # 3. Vendor Primary Demo Account
     demo_vendor_user = User(
@@ -78,7 +83,7 @@ def generate_synthetic_dataset():
         "Deepak Yadav", "Kavita Rao", "Sanjay Joshi", "Pooja Reddy", "Amitabh Das"
     ]
 
-    print("Creating 100+ Synthetic Street Vendor Profiles...")
+    print("Creating exactly 100 Synthetic Street Vendor Profiles...")
     vendors_list = []
 
     # Primary Vendor Demo
@@ -247,6 +252,7 @@ def generate_synthetic_dataset():
 
     print("Synthetic dataset successfully generated and seeded!")
     print(f"Total Seeded Vendors: {len(vendors_list)}")
+    print("Total Seeded Lenders: 10")
 
 if __name__ == "__main__":
     generate_synthetic_dataset()

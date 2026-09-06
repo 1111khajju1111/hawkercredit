@@ -9,3 +9,11 @@
 - Added the project changelog referenced by the README.
 - Added a root `.gitignore` for Python caches, test caches, Node dependencies, Next.js build output, and local environment files.
 - Removed generated caches and build artifacts from the release archive.
+
+
+## Model monitoring + demo population fix
+- Added idempotent persisted-model registration at API startup.
+- Admin `/api/v1/admin/metrics` now reports the ACTIVE persisted model metrics.
+- Added 10 demo lender accounts.
+- Kept the demo dataset at exactly 100 vendor profiles.
+- Persisted the complete 2,000-row synthetic model dataset size in model metadata.

@@ -18,9 +18,32 @@ def get_admin_metrics(
     total_quantum_runs = db.query(QuantumRun).count()
     total_audit_events = db.query(AuditLog).count()
 
-    models = db.query(ModelVersion).all()
-    if not models:
-        # Default active model info
+    # Always prefer the ACTIVE persisted credit model, rather than relying
+    # on insertion order (which previously could show stale/N/A metrics).
+    active_model_row = (
+        db.query(ModelVersion)
+        .filter(ModelVersion.model_name == "HawkerCredit AI Scorer")
+        .filter(ModelVersion.status == "ACTIVE")
+        .order_by(ModelVersion.created_at.desc())
+        .first()
+    )
+
+    if active_model_row:
+        active_model = {
+            "id": active_model_row.id,
+            "model_name": active_model_row.model_name,
+            "version": active_model_row.version,
+            "accuracy": active_model_row.accuracy,
+            "precision": active_model_row.precision,
+            "recall": active_model_row.recall,
+            "f1_score": active_model_row.f1_score,
+            "roc_auc": active_model_row.roc_auc,
+            "training_dataset_size": active_model_row.training_dataset_size,
+            "status": active_model_row.status,
+            "created_at": active_model_row.created_at,
+            "training_data_type": "SYNTHETIC",
+        }
+    else:
         active_model = {
             "model_name": "HawkerCredit AI Scorer",
             "version": "UNKNOWN_UNTIL_TRAINED",
@@ -30,10 +53,9 @@ def get_admin_metrics(
             "f1_score": None,
             "roc_auc": None,
             "training_dataset_size": None,
-            "training_data_type": "SYNTHETIC"
+            "status": "NOT_REGISTERED",
+            "training_data_type": "SYNTHETIC",
         }
-    else:
-        active_model = models[0].__dict__
 
     return {
         "system_metrics": {
@@ -46,5 +68,8 @@ def get_admin_metrics(
             "db_status": "CONNECTED"
         },
         "ai_model_monitoring": active_model,
-        "data_disclaimer": "AI credit-scoring model is trained on SYNTHETIC data for demonstration purposes."
+        "data_disclaimer": (
+            "AI credit-scoring model is trained on SYNTHETIC data for demonstration "
+            "purposes and has not been validated on real hawker repayment outcomes."
+        )
     }

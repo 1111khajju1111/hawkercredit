@@ -15,11 +15,22 @@ Base.metadata.create_all(bind=engine)
 
 db = SessionLocal()
 
+# Exactly 10 synthetic/demo lender accounts.
 users = [
     ("admin@hawkercredit.com", "9999900000", "admin123", "ADMIN"),
     ("lender@hawkercredit.com", "9999911111", "lender123", "LENDER"),
     ("vendor@hawkercredit.com", "9876543210", "vendor123", "VENDOR"),
 ]
+
+for i in range(2, 11):
+    users.append(
+        (
+            f"lender{i}@hawkercredit.com",
+            f"99999{i:05d}",
+            "lender123",
+            "LENDER",
+        )
+    )
 
 for email, phone, password, role in users:
     existing = db.query(User).filter(User.email == email).first()
@@ -41,3 +52,4 @@ db.commit()
 db.close()
 
 print("Demo users ready.")
+print("Lender accounts available: lender@hawkercredit.com and lender2@hawkercredit.com through lender10@hawkercredit.com")

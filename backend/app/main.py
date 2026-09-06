@@ -6,14 +6,21 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.core.config import settings
 from app.core.rate_limit import limiter
-from app.db.database import engine, Base, get_db
+from app.db.database import engine, Base, get_db, SessionLocal
+from app.ai.model_registry import register_persisted_model
 from app.api.v1 import (
     auth, vendors, transactions, expenses, inventory,
     loans, ai, credit, quantum, portfolio, consent, audit, admin
 )
 
-# Initialize database tables
+# Initialize database tables and register the persisted credit model.
 Base.metadata.create_all(bind=engine)
+try:
+    with SessionLocal() as _startup_db:
+        register_persisted_model(_startup_db)
+except Exception as _startup_error:
+    # The API must still start if model registration is temporarily unavailable.
+    print(f"Startup model registration warning: {_startup_error}")
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
