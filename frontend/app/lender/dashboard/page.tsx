@@ -9,14 +9,15 @@ import { ShieldCheck, Cpu, Users, DollarSign, TrendingUp, Sparkles, CheckCircle2
 export default function LenderDashboard() {
   const { loading: authLoading } = useRequireAuth(['LENDER', 'ADMIN']);
   const [vendors, setVendors] = useState<any[]>([]);
-  const [metrics, setMetrics] = useState<any>(null);
+  const [summary, setSummary] = useState<any>(null);
 
   useEffect(() => {
     if (authLoading) return;
     async function load() {
       try {
-        const vList = await api.getVendors();
-        setVendors(vList);
+        const s = await api.getLenderSummary();
+        setSummary(s);
+        setVendors(s.vendors || []);
       } catch (err) {
         console.error(err);
       }
@@ -48,7 +49,7 @@ export default function LenderDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="glass-card p-5 space-y-1">
           <div className="text-xs font-semibold text-gray-400">Total Vendor Pool</div>
-          <div className="text-3xl font-extrabold text-white">{vendors.length} Vendors</div>
+          <div className="text-3xl font-extrabold text-white">{summary?.total_vendors ?? vendors.length} Vendors</div>
           <p className="text-[11px] text-gray-400">Active daily business diaries</p>
         </div>
 
@@ -60,13 +61,17 @@ export default function LenderDashboard() {
 
         <div className="glass-card p-5 space-y-1">
           <div className="text-xs font-semibold text-gray-400">Avg Credit Intelligence Score</div>
-          <div className="text-3xl font-extrabold text-emeraldAccent">N/A</div>
-          <p className="text-[11px] text-gray-400">Low to Moderate Risk Profile</p>
+          <div className="text-3xl font-extrabold text-emeraldAccent">
+            {summary?.avg_credit_score != null ? Math.round(summary.avg_credit_score) : 'N/A'}
+          </div>
+          <p className="text-[11px] text-gray-400">Average persisted credit score</p>
         </div>
 
         <div className="glass-card p-5 space-y-1">
           <div className="text-xs font-semibold text-gray-400">Pending Human Reviews</div>
-          <div className="text-3xl font-extrabold text-warning">N/A</div>
+          <div className="text-3xl font-extrabold text-warning">
+            {summary?.pending_human_reviews ?? 'N/A'}
+          </div>
           <p className="text-[11px] text-gray-400">Requires human decision</p>
         </div>
       </div>
@@ -86,13 +91,17 @@ export default function LenderDashboard() {
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold text-white">{v.name}</span>
                 <span className="text-xs font-bold text-emeraldAccent bg-emeraldAccent/10 px-2 py-0.5 rounded-full border border-emeraldAccent/20">
-                  Score: N/A
+                  {v.score != null ? `Score: ${v.score}` : 'Score: N/A'}
                 </span>
               </div>
               <p className="text-xs text-gray-400">{v.business_type} • {v.location}</p>
               <div className="flex items-center justify-between pt-2 text-xs border-t border-border/40">
                 <span className="text-gray-400">Requested Loan:</span>
-                <strong className="text-cyanAccent">N/A</strong>
+                <strong className="text-cyanAccent">
+                  {v.requested_loan != null
+                    ? `₹${Number(v.requested_loan).toLocaleString('en-IN')}`
+                    : 'N/A'}
+                </strong>
               </div>
             </div>
           ))}

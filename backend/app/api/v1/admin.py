@@ -14,6 +14,7 @@ def get_admin_metrics(
 ):
     total_users = db.query(User).count()
     total_vendors = db.query(Vendor).count()
+    total_lenders = db.query(User).filter(User.role == "LENDER").count()
     total_loans = db.query(Loan).count()
     total_quantum_runs = db.query(QuantumRun).count()
     total_audit_events = db.query(AuditLog).count()
@@ -61,6 +62,7 @@ def get_admin_metrics(
         "system_metrics": {
             "total_users": total_users,
             "total_vendors": total_vendors,
+            "total_lenders": total_lenders,
             "total_loans": total_loans,
             "total_quantum_runs": total_quantum_runs,
             "total_audit_events": total_audit_events,

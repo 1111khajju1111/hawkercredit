@@ -31,6 +31,7 @@ export const api = {
 
   // Vendor
   getVendors: () => fetchApi('/vendors'),
+  getLenderSummary: () => fetchApi('/vendors/lender-summary'),
   getVendor: (id: string) => fetchApi(`/vendors/${id}`),
 
   // Transactions & Expenses

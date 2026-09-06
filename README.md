@@ -104,3 +104,30 @@ For a fresh demo database, run:
 
 For an existing database where users should be added without resetting vendor financial history, run:
 `python scripts/seed_demo_users.py`
+
+
+### Render demo deployment without shell access
+
+For the hosted demo, set this Render environment variable on the backend:
+
+`DEMO_SEED_ON_STARTUP=true`
+
+On startup the backend will **additively** ensure 10 synthetic lender
+accounts and 100 synthetic vendor profiles. It does not wipe an existing
+database. Empty demo vendor profiles receive 60 days of synthetic
+transactions/expenses plus credit features, scores, consent records and
+demo loans/repayments.
+
+The Admin Portal reads the persisted model metadata and displays Accuracy,
+Precision, Recall, F1 and ROC-AUC. The Lender Dashboard reads real persisted
+vendor scores and loan requests rather than displaying placeholder `N/A`
+values.
+
+Demo credentials remain:
+- Admin: `admin@hawkercredit.com` / `admin123`
+- Lender: `lender@hawkercredit.com` / `lender123`
+- Vendor: `vendor@hawkercredit.com` / `vendor123`
+
+All seeded vendor financial activity and all model-training data are
+synthetic demonstration data. They must not be represented as real
+repayment outcomes.

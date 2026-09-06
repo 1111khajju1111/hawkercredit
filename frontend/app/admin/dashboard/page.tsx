@@ -59,7 +59,7 @@ export default function AdminDashboard() {
       )}
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="glass-card p-5 space-y-1">
           <div className="text-xs font-semibold text-gray-400">Total Registered Users</div>
           <div className="text-3xl font-extrabold text-white">{metrics?.system_metrics?.total_users ?? 'N/A'}</div>
@@ -70,14 +70,26 @@ export default function AdminDashboard() {
           <div className="text-3xl font-extrabold text-cyanAccent">{metrics?.system_metrics?.total_vendors ?? 'N/A'}</div>
           <p className="text-[11px] text-gray-400">60-day financial diaries</p>
         </div>
-        <div className="glass-card p-5 space-y-1">
-          <div className="text-xs font-semibold text-gray-400">AI Model Accuracy</div>
+        <div className="glass-card p-5 space-y-2">
+          <div className="text-xs font-semibold text-gray-400">AI Model Performance</div>
           <div className="text-3xl font-extrabold text-emeraldAccent">
-            {hasTrainedModel ? `${(model.accuracy * 100).toFixed(0)}%` : 'N/A'}
+            {hasTrainedModel ? `${(model.accuracy * 100).toFixed(1)}%` : 'N/A'}
           </div>
-          <p className="text-[11px] text-gray-400">
-            {hasTrainedModel ? `ROC-AUC: ${model.roc_auc?.toFixed(2) ?? 'N/A'} (Scikit-Learn)` : 'No trained ModelVersion on record'}
-          </p>
+          {hasTrainedModel ? (
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-gray-400">
+              <span>Precision <b className="text-white">{(model.precision * 100).toFixed(1)}%</b></span>
+              <span>Recall <b className="text-white">{(model.recall * 100).toFixed(1)}%</b></span>
+              <span>F1 <b className="text-white">{(model.f1_score * 100).toFixed(1)}%</b></span>
+              <span>ROC-AUC <b className="text-white">{model.roc_auc?.toFixed(3) ?? 'N/A'}</b></span>
+            </div>
+          ) : (
+            <p className="text-[11px] text-gray-400">No trained ModelVersion on record</p>
+          )}
+        </div>
+        <div className="glass-card p-5 space-y-1">
+          <div className="text-xs font-semibold text-gray-400">Synthetic Lenders</div>
+          <div className="text-3xl font-extrabold text-cyanAccent">{metrics?.system_metrics?.total_lenders ?? 'N/A'}</div>
+          <p className="text-[11px] text-gray-400">Demo lender accounts</p>
         </div>
         <div className="glass-card p-5 space-y-1">
           <div className="text-xs font-semibold text-gray-400">Quantum Runs Executed</div>
@@ -85,6 +97,22 @@ export default function AdminDashboard() {
           <p className="text-[11px] text-gray-400">Qiskit QAOA Simulator</p>
         </div>
       </div>
+
+      {hasTrainedModel && (
+        <div className="glass-card p-4 text-xs text-gray-400">
+          <div className="font-bold text-white mb-1">
+            Model: {model.model_name} · {model.version}
+          </div>
+          <div>
+            Evaluation dataset: {model.training_dataset_size ?? 'N/A'} rows ·
+            Training data type: <span className="text-warning">{model.training_data_type || 'SYNTHETIC'}</span>.
+          </div>
+          <div className="mt-1">
+            Synthetic demonstration metrics only; this model has not been validated
+            against real hawker repayment outcomes.
+          </div>
+        </div>
+      )}
 
       {/* Audit Logs Table */}
       <div className="glass-card p-6 space-y-4">

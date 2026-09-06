@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
@@ -8,6 +9,7 @@ from app.core.config import settings
 from app.core.rate_limit import limiter
 from app.db.database import engine, Base, get_db, SessionLocal
 from app.ai.model_registry import register_persisted_model
+from app.demo_seed import ensure_demo_dataset
 from app.api.v1 import (
     auth, vendors, transactions, expenses, inventory,
     loans, ai, credit, quantum, portfolio, consent, audit, admin
@@ -21,6 +23,17 @@ try:
 except Exception as _startup_error:
     # The API must still start if model registration is temporarily unavailable.
     print(f"Startup model registration warning: {_startup_error}")
+
+# Demo environments can opt into an idempotent synthetic dataset on startup.
+# This never clears existing rows. Leave disabled for ordinary production
+# deployments unless a synthetic demo dataset is intentionally required.
+if os.getenv("DEMO_SEED_ON_STARTUP", "false").lower() in {"1", "true", "yes"}:
+    try:
+        ensure_demo_dataset()
+    except Exception as _demo_seed_error:
+        # A seeding problem must not hide the model-registration result or
+        # prevent the API from starting; the failure remains visible in logs.
+        print(f"Startup demo-data seeding warning: {_demo_seed_error}")
 
 app = FastAPI(
     title=settings.PROJECT_NAME,

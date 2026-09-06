@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from app.db.database import get_db
-from app.models.schema import Vendor
+from app.models.schema import Vendor, CreditScore, Loan, User
 from app.schemas.dto import VendorCreate, VendorResponse
 from app.core.security import verify_vendor_access, require_roles, get_current_user
 
