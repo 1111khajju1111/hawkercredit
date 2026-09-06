@@ -1,3 +1,12 @@
+# Unreleased – Demo UX & Lender Intelligence
+
+- Fixed lender dashboard vendor-pool summary and persisted 100-vendor synthetic demo visibility.
+- Added enriched vendor discovery fields: score, risk, repayment probability, data quality and requested loan.
+- Fixed lender access to explainable vendor profiles; discovery links now pass the selected vendor ID.
+- Added a first-class human underwriting queue with approve/reject actions and audit persistence.
+- Reused persisted QAOA/classical benchmark results to avoid duplicate quantum simulations and long benchmark waits.
+- Added SHAP contribution visualization and model-governance language to explainable credit profiles.
+
 # Changelog
 
 ## Hackathon hardening — September 5, 2026

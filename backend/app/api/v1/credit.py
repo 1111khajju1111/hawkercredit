@@ -58,6 +58,9 @@ def get_credit_profile(
         "vendor_id": vendor_id,
         "name": vendor.name,
         "business_type": vendor.business_type,
+        "location": vendor.location,
+        "operating_since": vendor.operating_since,
+        "operating_days": vendor.operating_days,
         "consent_required": False,
         "score": score["score"],
         "risk_category": score["risk_category"],
@@ -71,7 +74,11 @@ def get_credit_profile(
         "confidence_level": dq["confidence_level"],
         "positive_factors": explain["positive_factors"],
         "watch_factors": explain["watch_factors"],
+        "shap_contributions": explain.get("shap_contributions", []),
+        "explanation_method": explain.get("explanation_method", "UNKNOWN"),
         "features": features,
+        "recent_transaction_count": len(txs),
+        "recent_expense_count": len(exs),
         "model_version": score["model_version"],
         "disclaimer": (
             "Model-estimated alternative financial intelligence based on consented vendor data; "

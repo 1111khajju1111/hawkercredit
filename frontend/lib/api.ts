@@ -80,6 +80,7 @@ export const api = {
     }),
   getQuantumBenchmark: (capital: number = 1000000) => fetchApi(`/quantum/benchmark?available_capital=${capital}`),
   getQuantumRun: (runId: string) => fetchApi(`/quantum/runs/${runId}`),
+  getLatestQuantumRun: () => fetchApi('/quantum/runs/latest'),
 
   // Consent & Audit & Admin
   getConsent: (vendorId: string) => fetchApi(`/consent/${vendorId}`),

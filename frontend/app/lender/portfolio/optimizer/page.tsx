@@ -21,12 +21,31 @@ export default function QuantumOptimizerPage() {
     setRunning(true);
     setError(null);
     try {
-      const [qRes, benchRes] = await Promise.all([
-        api.runQuantumOptimize(capital, riskTolerance, pLayers, shots),
-        api.getQuantumBenchmark(capital)
-      ]);
+      // One QAOA execution is enough: the backend persists the classical
+      // reference alongside the quantum run. Avoid launching a second QAOA
+      // simulation just to populate the comparison table.
+      const qRes = await api.runQuantumOptimize(capital, riskTolerance, pLayers, shots);
       setQuantumResult(qRes);
-      setBenchmarkResult(benchRes);
+      if (qRes.classical_benchmark && qRes.solution_metrics) {
+        setBenchmarkResult({
+          run_id: qRes.run_id,
+          qaoa_quantum: {
+            best_bitstring: qRes.best_bitstring,
+            objective_value: qRes.objective_value,
+            execution_time_seconds: qRes.execution_time,
+            allocated_capital: qRes.allocated_capital,
+            expected_portfolio_risk: qRes.expected_portfolio_risk ?? 0,
+            selected_vendors: qRes.selected_vendors,
+          },
+          classical_baseline: qRes.classical_benchmark,
+          solution_metrics: qRes.solution_metrics,
+          comparison: {
+            objective_diff: Number(qRes.objective_value) - Number(qRes.classical_benchmark.objective_value || 0),
+            execution_time_diff_ms: (Number(qRes.execution_time) - Number(qRes.classical_benchmark.execution_time_seconds || 0)) * 1000,
+            capital_utilization_diff: Number(qRes.allocated_capital) - Number(qRes.classical_benchmark.allocated_capital || 0),
+          },
+        });
+      }
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Optimization failed');
@@ -137,6 +156,14 @@ export default function QuantumOptimizerPage() {
           <div className="glass-card p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div><div className="text-xs font-bold text-cyanAccent">PERSISTED AUDIT TRACE</div><div className="text-sm text-gray-300">Inspect the exact telemetry recorded for this optimization run.</div></div>
             <Link href={`/lender/decision-trace?run_id=${encodeURIComponent(quantumResult.run_id)}`} className="px-4 py-2 rounded-xl bg-surfaceLight text-white text-xs font-bold border border-border">Open Decision Trace</Link>
+          </div>
+
+          <div className="glass-card p-6 space-y-4 border-l-4 border-l-accent">
+            <div><h2 className="text-lg font-bold flex items-center gap-2"><Sparkles className="w-5 h-5 text-accent" /> Recommended Vendor Portfolio</h2><p className="text-xs text-gray-400">These are the vendors selected by the validated optimization result. The recommendation is decision support, not an automatic lending approval.</p></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {(quantumResult.selected_vendors || []).map((id:string, i:number) => <div key={id} className="p-4 rounded-xl bg-surfaceLight/60 border border-border"><div className="text-[10px] uppercase text-gray-500">Rank #{i+1}</div><div className="font-mono text-xs text-white mt-1 break-all">{id}</div></div>)}
+              {!quantumResult.selected_vendors?.length && <div className="text-xs text-gray-400">No vendor selected under the current constraints.</div>}
+            </div>
           </div>
 
           {/* Side-by-side Quantum vs Classical Benchmark Comparison Table */}

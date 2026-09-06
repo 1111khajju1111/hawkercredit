@@ -213,6 +213,8 @@ def run_quantum_optimization_impl(
         classical_reference_is_provably_optimal=solution_metrics["classical_reference_is_provably_optimal"],
         selected_vendors=final_selected_vendors,
         allocated_capital=final_allocated_capital,
+        expected_portfolio_risk=final_expected_risk,
+        expected_portfolio_return=final_expected_return,
         allocations=q_run.result["allocations"],
         status=q_run.status,
         validation_status=q_run.validation_status,
@@ -230,6 +232,19 @@ def run_quantum_optimization(
     current_user=Depends(require_roles(["LENDER", "ADMIN"])),
 ):
     return run_quantum_optimization_impl(payload, db=db, current_user=current_user)
+
+@router.get("/runs/latest")
+@limiter.limit("60/minute")
+def get_latest_quantum_run(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_roles(["LENDER", "ADMIN"])),
+):
+    q_run = db.query(QuantumRun).order_by(QuantumRun.created_at.desc()).first()
+    if not q_run:
+        raise HTTPException(status_code=404, detail="No quantum optimization run has been persisted yet")
+    return q_run
+
 
 @router.get("/runs/{run_id}")
 @limiter.limit("60/minute")
@@ -255,6 +270,38 @@ def get_quantum_vs_classical_benchmark(
     db: Session = Depends(get_db),
     current_user=Depends(require_roles(["LENDER", "ADMIN"])),
 ):
+    # A completed optimizer run already persisted the exact QAOA result and
+    # its classical reference. Reuse it for the benchmark screen instead of
+    # executing a second expensive QAOA simulation.
+    latest = db.query(QuantumRun).order_by(QuantumRun.created_at.desc()).first()
+    if latest and latest.result and abs(float(latest.qubo_parameters.get("available_capital", available_capital)) - available_capital) < 0.01:
+        stored = latest.result
+        if stored.get("classical_benchmark") and stored.get("solution_metrics"):
+            q = {
+                "algorithm": latest.algorithm,
+                "backend": latest.backend,
+                "best_bitstring": stored.get("best_bitstring", ""),
+                "objective_value": latest.objective_value,
+                "execution_time_seconds": latest.execution_time,
+                "selected_vendors": stored.get("raw_qaoa_selected_vendors", []),
+                "allocated_capital": stored.get("raw_qaoa_allocated_capital", 0),
+                "expected_portfolio_risk": stored.get("raw_qaoa_expected_portfolio_risk", 0),
+                "expected_portfolio_return": stored.get("raw_qaoa_expected_portfolio_return", 0),
+            }
+            return {
+                "run_id": latest.run_id,
+                "qaoa_quantum": q,
+                "classical_baseline": stored["classical_benchmark"],
+                "validation": stored.get("validation", {}),
+                "solution_metrics": stored["solution_metrics"],
+                "disclaimer": "Replayed from the latest persisted QAOA run; no second quantum simulation was required.",
+                "comparison": {
+                    "objective_diff": round(q["objective_value"] - float(stored["classical_benchmark"].get("objective_value", 0)), 4),
+                    "execution_time_diff_ms": round((q["execution_time_seconds"] - float(stored["classical_benchmark"].get("execution_time_seconds", 0))) * 1000, 2),
+                    "capital_utilization_diff": round(q["allocated_capital"] - float(stored["classical_benchmark"].get("allocated_capital", 0)), 2),
+                },
+            }
+
     candidates = db.query(Vendor).limit(30).all()
     vendors = [v for v in candidates if check_consent(v.vendor_id, "PORTFOLIO_MATCHING", db)][:10]
     vendors_data = []

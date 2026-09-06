@@ -49,6 +49,13 @@ class VendorResponse(BaseModel):
     registration_status: str
     operating_days: int
     created_at: datetime
+    # Optional lender/admin intelligence fields populated by vendor discovery.
+    score: Optional[float] = None
+    risk_category: Optional[str] = None
+    repayment_probability: Optional[float] = None
+    data_quality_score: Optional[float] = None
+    requested_loan: Optional[float] = None
+    pending_human_review: Optional[bool] = None
 
 # Transaction Schemas
 class TransactionCreate(BaseModel):
@@ -184,10 +191,14 @@ class QuantumRunResponse(BaseModel):
     classical_reference_is_provably_optimal: Optional[bool] = None
     selected_vendors: List[str]
     allocated_capital: float
+    expected_portfolio_risk: Optional[float] = None
+    expected_portfolio_return: Optional[float] = None
     # Per-vendor allocation detail from THIS optimization run - the single
     # source of truth that downstream consumers (e.g. portfolio.py) should
     # persist, instead of separately hardcoding placeholder numbers.
     allocations: Optional[List[Dict[str, Any]]] = None
+    classical_benchmark: Optional[Dict[str, Any]] = None
+    solution_metrics: Optional[Dict[str, Any]] = None
     status: str
     validation_status: str
     fallback_used: bool

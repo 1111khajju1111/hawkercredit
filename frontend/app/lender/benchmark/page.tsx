@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { useRequireAuth } from '@/lib/auth';
-import { BarChart2, RefreshCw, CheckCircle2, Cpu } from 'lucide-react';
+import Link from 'next/link';
+import { BarChart2, RefreshCw, CheckCircle2, Cpu, Zap } from 'lucide-react';
 
 export default function BenchmarkPage() {
   useRequireAuth(['LENDER', 'ADMIN']);
@@ -19,13 +20,15 @@ export default function BenchmarkPage() {
       const res = await api.getQuantumBenchmark(capital);
       setResult(res);
     } catch (err: any) {
-      setError(err.message || 'Failed to run benchmark');
+      setError(err.message || 'No persisted optimization run is available yet. Run the Quantum Optimizer first.');
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
+    // Reuse the latest persisted optimization. This page must never silently
+    // launch a second expensive QAOA simulation on initial render.
     runBenchmark();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -37,7 +40,7 @@ export default function BenchmarkPage() {
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <BarChart2 className="w-6 h-6 text-accent" /> Quantum vs Classical Benchmark
           </h1>
-          <p className="text-xs text-gray-400">Direct comparison of the QAOA quantum solver against the classical exact/greedy baseline on the same QUBO constraints</p>
+          <p className="text-xs text-gray-400">Fast replay of the latest persisted QAOA run against its classical exact/greedy baseline. No duplicate quantum simulation is launched here.</p>
         </div>
         <div className="flex items-center gap-3">
           <input
@@ -52,7 +55,7 @@ export default function BenchmarkPage() {
             className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-accent to-primary text-white font-bold text-xs flex items-center gap-2"
           >
             {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Cpu className="w-4 h-4" />}
-            {loading ? 'Running...' : 'Re-run Benchmark'}
+            {loading ? 'Loading saved run...' : 'Refresh Benchmark'}
           </button>
         </div>
       </div>
@@ -61,7 +64,17 @@ export default function BenchmarkPage() {
         <div className="glass-card p-4 text-xs font-bold text-red-400 border border-red-400/40">{error}</div>
       )}
 
+      {!result && !loading && !error && (
+        <div className="glass-card p-8 text-center space-y-4">
+          <Zap className="w-8 h-8 text-accent mx-auto" />
+          <h2 className="text-lg font-bold">No benchmark run yet</h2>
+          <p className="text-xs text-gray-400">Run the Quantum Optimizer once. Its QAOA result and classical reference are persisted and will appear here instantly.</p>
+          <Link href="/lender/portfolio/optimizer" className="inline-flex px-4 py-2.5 rounded-xl bg-gradient-to-r from-accent to-primary text-white text-xs font-bold">Open Quantum Optimizer</Link>
+        </div>
+      )}
+
       {result && (
+
         <div className="glass-card p-6 space-y-4">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-gray-300">

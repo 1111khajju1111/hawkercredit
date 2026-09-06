@@ -25,9 +25,8 @@ except Exception as _startup_error:
     print(f"Startup model registration warning: {_startup_error}")
 
 # Demo environments can opt into an idempotent synthetic dataset on startup.
-# This never clears existing rows. Leave disabled for ordinary production
-# deployments unless a synthetic demo dataset is intentionally required.
-if os.getenv("DEMO_SEED_ON_STARTUP", "false").lower() in {"1", "true", "yes"}:
+# This never clears existing rows. Enabled by default in the production-demo bundle; set DEMO_SEED_ON_STARTUP=false for a clean non-demo deployment.
+if os.getenv("DEMO_SEED_ON_STARTUP", "true").lower() in {"1", "true", "yes"}:
     try:
         ensure_demo_dataset()
     except Exception as _demo_seed_error:
