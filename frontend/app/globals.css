@@ -28,7 +28,10 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Neo-Brutalist Utility Classes */
+/* =========================================================
+   NEO-BRUTALIST UTILITY CLASSES
+   ========================================================= */
+
 .brutal-card {
   background-color: var(--card-bg);
   border: 2px solid #000000;
@@ -94,38 +97,167 @@ body {
   border: 1px solid currentColor;
 }
 
-/* Custom Scrollbar */
+/* =========================================================
+   CUSTOM SCROLLBAR
+   ========================================================= */
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--bg);
 }
+
 ::-webkit-scrollbar-thumb {
   background: #dc2626;
   border: 1px solid #000000;
 }
 
+/* =========================================================
+   INPUTS
+   Input text is ALWAYS BLACK
+   ========================================================= */
 
 input,
 textarea,
 select {
-  color: var(--fg);
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
 }
 
 input::placeholder,
-textarea::placeholder {
-  color: #666666;
+textarea::placeholder,
+select::placeholder {
+  color: #666666 !important;
+  opacity: 1;
 }
+
+/* =========================================================
+   AUTOFILL
+   Autofilled values are ALWAYS BLACK
+   ========================================================= */
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+  -webkit-text-fill-color: #000000 !important;
+  color: #000000 !important;
+}
+
+/* =========================================================
+   LIGHT MODE
+   Normal text is BLACK
+   ========================================================= */
+
+html:not(.dark) body {
+  color: #000000;
+}
+
+/* Common Tailwind gray/white text classes become black
+   in Light Mode. */
+
+html:not(.dark) .text-white {
+  color: #000000 !important;
+}
+
+html:not(.dark) .text-gray-100 {
+  color: #000000 !important;
+}
+
+html:not(.dark) .text-gray-200 {
+  color: #000000 !important;
+}
+
+html:not(.dark) .text-gray-300 {
+  color: #000000 !important;
+}
+
+html:not(.dark) .text-gray-400 {
+  color: #000000 !important;
+}
+
+html:not(.dark) .text-gray-500 {
+  color: #000000 !important;
+}
+
+html:not(.dark) .text-gray-600 {
+  color: #000000 !important;
+}
+
+html:not(.dark) .text-gray-700 {
+  color: #000000 !important;
+}
+
+html:not(.dark) .text-gray-800 {
+  color: #000000 !important;
+}
+
+/* =========================================================
+   LIGHT MODE - KEEP WHITE TEXT ON RED/DARK BUTTONS
+   ========================================================= */
+
+html:not(.dark) .bg-red-500.text-white,
+html:not(.dark) .bg-red-600.text-white,
+html:not(.dark) .bg-red-700.text-white,
+html:not(.dark) .bg-red-800.text-white,
+html:not(.dark) .bg-red-900.text-white,
+html:not(.dark) .bg-black.text-white,
+html:not(.dark) .bg-brandRed.text-white {
+  color: #ffffff !important;
+}
+
+/* Keep white text inside buttons/cards that intentionally
+   use a red or black background. */
+
+html:not(.dark) button.bg-red-500,
+html:not(.dark) button.bg-red-600,
+html:not(.dark) button.bg-red-700,
+html:not(.dark) button.bg-brandRed,
+html:not(.dark) .brutal-card-red {
+  color: #ffffff !important;
+}
+
+/* =========================================================
+   DARK MODE
+   Preserve existing dark-mode text behavior
+   ========================================================= */
 
 .dark input,
 .dark textarea,
 .dark select {
-  color: #ffffff;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 .dark input::placeholder,
-.dark textarea::placeholder {
-  color: #aaaaaa;
+.dark textarea::placeholder,
+.dark select::placeholder {
+  color: #aaaaaa !important;
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active,
+.dark textarea:-webkit-autofill,
+.dark textarea:-webkit-autofill:hover,
+.dark textarea:-webkit-autofill:focus,
+.dark textarea:-webkit-autofill:active,
+.dark select:-webkit-autofill,
+.dark select:-webkit-autofill:hover,
+.dark select:-webkit-autofill:focus,
+.dark select:-webkit-autofill:active {
+  -webkit-text-fill-color: #ffffff !important;
+  color: #ffffff !important;
 }
