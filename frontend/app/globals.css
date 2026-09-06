@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: #ffffff;
+    --fg: #000000;
+    --card-bg: #ffffff;
+    --border-color: #000000;
+    --red-accent: #dc2626;
+  }
+
+  .dark {
+    --bg: #050505;
+    --fg: #ffffff;
+    --card-bg: #0f0f0f;
+    --border-color: #262626;
+    --red-accent: #ef4444;
+  }
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Neo-Brutalist Utility Classes */
+.brutal-card {
+  background-color: var(--card-bg);
+  border: 2px solid #000000;
+  box-shadow: 4px 4px 0px 0px #000000;
+  transition: all 0.15s ease-in-out;
+}
+
+.dark .brutal-card {
+  border: 2px solid #262626;
+  box-shadow: 4px 4px 0px 0px #dc2626;
+}
+
+.brutal-card-red {
+  background-color: #dc2626;
+  color: #ffffff;
+  border: 2px solid #000000;
+  box-shadow: 5px 5px 0px 0px #000000;
+}
+
+.dark .brutal-card-red {
+  border: 2px solid #ffffff;
+  box-shadow: 5px 5px 0px 0px #ffffff;
+}
+
+.brutal-btn {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 2px solid #000000;
+  box-shadow: 3px 3px 0px 0px #000000;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.dark .brutal-btn {
+  border: 2px solid #ffffff;
+  box-shadow: 3px 3px 0px 0px #dc2626;
+}
+
+.brutal-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0px 0px #000000;
+}
+
+.dark .brutal-btn:hover {
+  box-shadow: 5px 5px 0px 0px #dc2626;
+}
+
+.brutal-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px 0px #000000;
+}
+
+.dark .brutal-btn:active {
+  box-shadow: 1px 1px 0px 0px #dc2626;
+}
+
+.brutal-badge {
+  font-family: monospace;
+  font-weight: 800;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid currentColor;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: #dc2626;
+  border: 1px solid #000000;
+}
